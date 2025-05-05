@@ -3,6 +3,7 @@ import { createContext, forwardRef, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 
+import { Dialog } from "@calcom/features/components/controlled-dialog";
 import { useOrgBranding } from "@calcom/features/ee/organizations/context/provider";
 import { RoutingFormEmbedButton, RoutingFormEmbedDialog } from "@calcom/features/embed/RoutingFormEmbed";
 import { EmbedDialogProvider } from "@calcom/features/embed/lib/hooks/useEmbedDialogCtx";
@@ -14,7 +15,6 @@ import classNames from "@calcom/ui/classNames";
 import type { ButtonProps } from "@calcom/ui/components/button";
 import { Button } from "@calcom/ui/components/button";
 import {
-  Dialog,
   DialogContent,
   DialogFooter,
   DialogClose,
@@ -174,7 +174,7 @@ export const FormActionsDropdown = ({
             type="button"
             variant="icon"
             color="secondary"
-            className={classNames("radix-state-open:rounded-r-md", disabled && "opacity-30")}
+            className={classNames(disabled && "opacity-30")}
             StartIcon="ellipsis"
           />
         </DropdownMenuTrigger>
@@ -391,6 +391,7 @@ export function FormActionsProvider({
 
 type FormActionType =
   | "preview"
+  | "incompleteBooking"
   | "edit"
   | "copyLink"
   | "toggle"
@@ -470,6 +471,9 @@ export const FormAction = forwardRef(function FormAction<T extends typeof Button
     edit: {
       href: `${appUrl}/form-edit/${routingForm?.id}`,
     },
+    incompleteBooking: {
+      href: `${appUrl}/incomplete-booking/${routingForm?.id}`,
+    },
     download: {
       href: `/api/integrations/routing-forms/responses/${routingForm?.id}`,
     },
@@ -499,6 +503,7 @@ export const FormAction = forwardRef(function FormAction<T extends typeof Button
               extraClassNames
             )}>
             <Switch
+              data-testid="toggle-form-switch"
               disabled={!!disabled}
               checked={!routingForm.disabled}
               label={label}
@@ -540,7 +545,7 @@ export const FormAction = forwardRef(function FormAction<T extends typeof Button
         {...actionProps}
         className={classNames(
           props.className,
-          "w-full transition-none",
+          "text-default w-full transition-none",
           props.color === "destructive" && "border-0"
         )}>
         {children}
